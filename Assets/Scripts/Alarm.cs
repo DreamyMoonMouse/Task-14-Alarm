@@ -1,16 +1,20 @@
 using UnityEngine;
+using System.Collections;
 
 public class Alarm : MonoBehaviour
 {
-    [SerializeField] private AudioSource alarmSound;
-    [SerializeField] private float volumeChangeSpeed = 0.5f;
-    private float targetVolume = 0f;
+    [SerializeField] private AudioSource _alarmSound;
+    [SerializeField] private float _volumeChangeSpeed = 0.3f;
+
+    private float _targetVolume = 0f;
+    private Coroutine _volumeCoroutine;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.TryGetComponent(out Thief thief))
         {
-            targetVolume = 1f;
+            _targetVolume = 1f;
+            StartVolumeChange();
         }
     }
 
@@ -18,12 +22,27 @@ public class Alarm : MonoBehaviour
     {
         if (other.TryGetComponent(out Thief thief))
         {
-            targetVolume = 0f; 
+            _targetVolume = 0f;
+            StartVolumeChange();
         }
     }
 
-    private void Update()
+    private void StartVolumeChange()
     {
-        alarmSound.volume = Mathf.MoveTowards(alarmSound.volume, targetVolume, volumeChangeSpeed * Time.deltaTime);
+        if (_volumeCoroutine != null)
+        {
+            StopCoroutine(_volumeCoroutine);
+        }
+        
+        _volumeCoroutine = StartCoroutine(ChangeVolume());
+    }
+
+    private IEnumerator ChangeVolume()
+    {
+        while (Mathf.Abs(_alarmSound.volume - _targetVolume) > Mathf.Epsilon)
+        {
+            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, _targetVolume, _volumeChangeSpeed * Time.deltaTime);
+            yield return null;
+        }
     }
 }

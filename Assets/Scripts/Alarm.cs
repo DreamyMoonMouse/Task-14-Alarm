@@ -1,9 +1,10 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Serialization;
 
 public class Alarm : MonoBehaviour
 {
-    [SerializeField] private AudioSource _alarmSound;
+    [SerializeField] private AudioSource _sound;
     [SerializeField] private float _volumeChangeSpeed = 0.3f;
 
     private float _targetVolume = 0f;
@@ -39,9 +40,9 @@ public class Alarm : MonoBehaviour
 
     private IEnumerator ChangeVolume()
     {
-        while (Mathf.Abs(_alarmSound.volume - _targetVolume) > Mathf.Epsilon)
+        while (Mathf.Abs(_sound.volume - _targetVolume) > Mathf.Epsilon)
         {
-            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, _targetVolume, _volumeChangeSpeed * Time.deltaTime);
+            _sound.volume = Mathf.MoveTowards(_sound.volume, _targetVolume, _volumeChangeSpeed * Time.deltaTime);
             yield return null;
         }
     }
